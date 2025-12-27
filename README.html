@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GD Ultimate Edition</title>
+    <style>
+        /* Главные переменные, чтоб менять всё одной цифрой */
+        :root {
+            /* Яркий цвет морской волны */
+            --u-cyan: #00ffcc;
+            /* Фиолетовый для кнопок редактора */
+            --u-purple: #4a195c;
+            /* Цвет самого глубокого фона */
+            --bg-body: #02050a;
+            /* Цвет для карточек с текстом */
+            --bg-card: #0b1120;
+            /* Основной белый текст */
+            --text-main: #ffffff;
+            /* Серый текст для описаний */
+            --text-muted: #94a3b8;
+            /* Зеленый для успехов */
+            --accent-green: #22c55e;
+            /* Синий для выделения */
+            --accent-blue: #3b82f6;
+            /* Цвет рамок */
+            --border-color: #1e293b;
+            /* Цвет кубика по дефолту */
+            --u-yellow: #ffff00;
+            /* Цвет опасных шипов */
+            --u-red: #ff1100;
+        }
+
+        /* Настройки для всего тела страницы */
+        body {
+            /* Убираем отступы */
+            margin: 0;
+            /* Ставим темный фон */
+            background-color: var(--bg-body);
+            /* Весь текст — белый */
+            color: var(--text-main);
+            /* Ставим шрифт без засечек */
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            /* Запрещаем прокрутку вбок */
+            overflow-x: hidden;
+            /* Запрещаем юзеру копировать текст мышкой */
+            user-select: none;
+            /* Межстрочный интервал для красоты */
+            line-height: 1.5;
+        }
+
+        /* Верхняя панель сайта */
+        .navbar {
+            /* Черный прозрачный фон */
+            background: rgba(2, 5, 10, 0.95);
+            /* Линия снизу */
+            border-bottom: 1px solid var(--border-color);
+            /* Отступы сверху и снизу */
+            padding: 20px 0;
+            /* Прибиваем к верху экрана */
+            position: fixed;
+            /* Растягиваем на всю ширину */
+            width: 100%;
+            /* Нулевая координата сверху */
+            top: 0;
+            /* Чтоб была поверх всех элементов */
+            z-index: 100;
+            /* Размытие фона за панелью */
+            backdrop-filter: blur(10px);
+        }
+
+        /* Центровщик контента */
+        .container {
+            /* Максимальная ширина чтоб не размазало на весь экран */
+            max-width: 1100px;
+            /* Центрируем блок */
+            margin: 0 auto;
+            /* Поля по бокам */
+            padding: 0 20px;
+        }
+
+        /* Навигация внутри панели */
+        .nav-content {
+            /* Делаем флексбокс */
+            display: flex;
+            /* Разносим лого и кнопку */
+            justify-content: space-between;
+            /* Центруем по вертикали */
+            align-items: center;
+        }
+
+        /* Текст логотипа */
+        .logo { font-size: 24px; font-weight: 900; color: white; letter-spacing: 1px; }
+        /* Подкрашиваем слово Ultimate */
+        .logo span { color: var(--u-cyan); }
+
+        /* Кароче стиль главной кнопки */
+        .btn-main {
+            /* Градиент из циана в синий */
+            background: linear-gradient(45deg, var(--u-cyan), #00ccff);
+            /* Черные буквы для контраста */
+            color: black;
+            /* Внутренние отступы */
+            padding: 12px 25px;
+            /* Скругляем края */
+            border-radius: 8px;
+            /* Убираем подчеркивание */
+            text-decoration: none;
+            /* Очень жирный шрифт */
+            font-weight: 800;
+            /* Размер текста */
+            font-size: 16px;
+            /* Делаем блочным элементом */
+            display: inline-block;
+            /* Небольшое свечение */
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+            /* Плавность анимации */
+            transition: 0.3s;
+            /* Убираем стандартную рамку */
+            border: none;
+            /* Курсор-палец */
+            cursor: pointer;
+            /* Капсом все буквы */
+            text-transform: uppercase;
+        }
+        /* Анимация когда навел на кнопку */
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--u-cyan); }
+
+        /* Первый блок страницы */
+        .hero {
+            /* Огромный отступ под навигацию */
+            padding: 180px 0 120px;
+            /* Крутой градиент на фоне */
+            background: radial-gradient(circle at top center, #1a2035 0%, var(--bg-body) 70%);
+            /* Выравнивание */
+            display: flex;
+            align-items: center;
+        }
+
+        /* Сетка для текста и картинки */
+        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        /* Заголовок в первом блоке */
+        .hero h1 { font-size: 48px; line-height: 1.1; margin-bottom: 20px; }
+        /* Описание под заголовком */
+        .hero p { color: var(--text-muted); font-size: 18px; margin-bottom: 30px; max-width: 450px; }
+
+        /* Общие заголовки секций */
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        /* Секция с таблицей сравнения */
+        .comparison-section {
+            padding: 80px 0;
+            background: var(--bg-body);
+        }
+
+        /* Обертка для таблицы */
+        .comparison-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            /* Срезаем углы если таблица вылезет */
+            overflow: hidden;
+        }
+
+        /* Сама таблица */
+        .comp-table {
+            width: 100%;
+            /* Убираем зазоры между ячейками */
+            border-collapse: collapse;
+        }
+
+        /* Ячейки таблицы */
+        .comp-table th, .comp-table td {
+            padding: 25px 30px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Убираем линию у последней строки */
+        .comp-table tr:last-child td { border-bottom: none; }
+        /* Шапка таблицы */
+        .comp-table th { font-size: 18px; font-weight: 700; color: white; }
+        /* Выделение нашей колонки */
+        .th-highlight { color: var(--accent-blue) !important; font-size: 20px; } 
+        /* Обычный текст ячеек */
+        .comp-table td { font-size: 16px; color: var(--text-muted); }
+        /* Зеленый текст преимуществ */
+        .td-success { color: var(--accent-green) !important; font-weight: 600; }
+
+        /* Секция с фишками проекта */
+        .features-section {
+            padding: 80px 0 120px;
+            background: var(--bg-body);
+        }
+
+        /* Сетка для фишек */
+        .features-grid {
+            display: grid;
+            /* Колонки подстраиваются под экран */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        /* Карточка одной фишки */
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 40px;
+            /* Плавное движение при наведении */
+            transition: 0.3s;
+            border: 1px solid transparent;
+        }
+
+        /* Реакция на наведение на фишку */
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-color);
+            background: #101829;
+        }
+
+        /* Иконка фишки */
+        .feature-icon {
+            width: 60px; height: 60px; margin-bottom: 25px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        /* Внутренняя картинка иконки */
+        .feature-icon svg { width: 100%; height: 100%; }
+
+        /* Заголовок фишки */
+        .feature-card h3 { font-size: 22px; margin: 0 0 15px 0; font-weight: 700; }
+        /* Текст фишки */
+        .feature-card p { color: var(--text-muted); margin: 0; font-size: 16px; line-height: 1.6; }
+
+        /* Тут кароче начинаются стили геймплея */
+        #game-view {
+            /* Закрываем весь экран игрой */
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #222; z-index: 1000; display: none;
+        }
+        /* Базовый экран (меню или смерть) */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; background: rgba(0, 0, 0, 0.85); z-index: 1020;
+        }
+        /* Прячем ненужное через этот класс */
+        .hidden { display: none !important; }
+        /* Фон игрового мира */
+        #world-layer { width: 100%; height: 100%; background: linear-gradient(to bottom, #1a0b2e, #4a195c); position: relative; overflow: hidden; }
+        /* Сетка для атмосферы */
+        #bg-grid { position: absolute; width: 200%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 50px 50px; }
+        /* Твердый пол под кубом */
+        #floor { position: absolute; bottom: 0; width: 100%; height: 80px; background: #111; border-top: 4px solid var(--u-cyan); z-index: 1010; }
+        /* Кароче наш персонаж КУБИК */
+        #cube { width: 50px; height: 50px; position: absolute; bottom: 80px; left: 150px; z-index: 1015; background-color: var(--u-yellow); border: 3px solid #000; box-sizing: border-box; }
+        
+        /* Общий стиль для всех объектов в мире */
+        .obstacle { position: absolute; z-index: 1005; }
+        /* Геометрия шипа */
+        .spike { width: 0; height: 0; border-left: 25px solid transparent; border-right: 25px solid transparent; border-bottom: 50px solid var(--u-red); bottom: 80px; }
+        /* Стильный портал */
+        .portal { width: 50px; height: 120px; border: 4px solid #d0f; bottom: 80px; border-radius: 12px; background: rgba(200, 0, 255, 0.2); box-shadow: 0 0 20px #d0f; }
+        /* Квадратный блок */
+        .block { width: 50px; height: 50px; background: #444; border: 3px solid #fff; box-sizing: border-box; }
+        /* Блок с бонусом +2 */
+        .block-bonus { width: 150px; background: #554400; border: 4px solid #ffcc00; display: flex; justify-content: center; align-items: center; font-weight: bold; color: #ffcc00; }
+        /* Надпись на бонусе */
+        .block-bonus::after { content: "+2 PTS"; font-size: 14px; }
+        /* Цифры счета сверху */
+        #hud-score { position: absolute; top: 30px; right: 50px; font-size: 48px; font-weight: 900; z-index: 1025; color: white; text-shadow: 2px 2px 4px black; }
+        /* Квадратики в редакторе скинов */
+        .swatch { width: 40px; height: 40px; border: 2px solid #fff; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        /* Если цвет еще не открыт */
+        .swatch.locked { cursor: not-allowed; opacity: 0.3; background: #333 !important; }
+        
+        /* Низ страницы */
+        footer { padding: 40px; text-align: center; border-top: 1px solid var(--border-color); color: var(--text-muted); background: var(--bg-body); }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="container nav-content">
+            <div class="logo">GD<span>ULTIMATE</span></div>
+            <button class="btn-main" style="padding: 10px 20px; font-size: 14px;" onclick="openGame()">ИГРАТЬ</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container hero-grid">
+            <div>
+                <h1 style="color: var(--u-cyan);">GD Ultimate Edition</h1>
+                <p>Твоя любимая игра теперь с редактором скинов, порталами и хардкорными уровнями прямо в браузере.</p>
+                <button class="btn-main" onclick="openGame()">ЗАПУСТИТЬ КЛИЕНТ</button>
+            </div>
+            <div style="text-align: center;">
+                <img src="https://i.imgur.com/YPGuTAQ.png" alt="GD Ultimate" style="width: 550px; height: auto; filter: drop-shadow(0 0 20px rgba(0, 255, 204, 0.5));">
+            </div>
+        </div>
+    </section>
+
+    <section class="comparison-section">
+        <div class="container">
+            <h2 class="section-title">В чем отличие от обычных игр?</h2>
+            <div class="comparison-card">
+                <table class="comp-table">
+                    <thead>
+                        <tr>
+                            <th>Функция</th>
+                            <th>Обычные игры</th>
+                            <th class="th-highlight">GD Ultimate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Препятствия</td><td>Однообразные, предустановленные</td><td class="td-success">Процедурная генерация</td></tr>
+                        <tr><td>Хитбоксы</td><td>Сломанные</td><td class="td-success">Правильные с отступами</td></tr>
+                        <tr><td>Физика</td><td>Линейная</td><td class="td-success">Продвинутая инерция</td></tr>
+                        <tr><td>Оптимизация</td><td>Средняя</td><td class="td-success">Идеально для браузеров</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <div id="game-view">
+        <div id="world-layer">
+            <div id="bg-grid"></div>
+            <div id="hud-score">0</div>
+            <div id="cube"></div>
+            <div id="floor"></div>
+        </div>
+
+        <div id="menu-screen" class="screen">
+            <h1 style="font-size: 60px; margin-bottom: 20px; color:white;">GD ULTIMATE</h1>
+            <button class="btn-main" style="font-size: 30px; margin-bottom: 20px;" onclick="startGame()">ИГРАТЬ</button>
+            <div style="display: flex; gap: 20px;">
+                <button class="btn-main" style="background: var(--u-purple); color: white;" onclick="openEditor()">СКИНЫ</button>
+                <button class="btn-main" style="background: #555; color: white;" onclick="closeGame()">ВЫЙТИ</button>
+            </div>
+            <div id="high-score-label" style="margin-top: 20px; color: var(--u-cyan); font-weight: bold;">РЕКОРД: 0</div>
+        </div>
+
+        <div id="game-over-screen" class="screen hidden">
+            <h1 style="color: var(--u-red); font-size: 50px;">GAME OVER</h1>
+            <p style="font-size: 24px; color:white;">Счет: <span id="final-res">0</span></p>
+            <button class="btn-main" onclick="startGame()">ЗАНОВО</button>
+            <button class="btn-main" style="background: #333; color: white; margin-top:10px;" onclick="showMenu()">В МЕНЮ</button>
+        </div>
+
+        <div id="editor-screen" class="screen hidden">
+            <h2 style="color:white;">РЕДАКТОР</h2>
+            <canvas id="skin-tool" width="16" height="16" style="width: 200px; height: 200px; image-rendering: pixelated; border: 4px solid var(--u-cyan); background: #000;"></canvas>
+            <div id="color-palette" style="display:flex; gap:10px; margin: 20px 0;"></div>
+            <button class="btn-main" onclick="applySkin()">СОХРАНИТЬ</button>
+            <button class="btn-main" style="background: #333; color: white; margin-top: 10px;" onclick="showMenu()">ОТМЕНА</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>© GD Ultimate Edition. Все права защищены.</p>
+    </footer>
+
+    <script>
+        // Достаем игрока
+        const cube = document.getElementById('cube');
+        // Достаем счет
+        const hudScore = document.getElementById('hud-score');
+        // Достаем надпись рекорда
+        const highScoreLabel = document.getElementById('high-score-label');
+        // Достаем холст редактора
+        const skinTool = document.getElementById('skin-tool');
+        // Инструмент рисования
+        const ctx = skinTool.getContext('2d');
+
+        // Переменные состояния игры
+        let runGame = false, miniMode = false, jumpHeld = false;
+        // Параметры движения (высота, скорость, очки, кадры)
+        let cY = 0, velY = 0, curScore = 0, frames = 0;
+        // Объекты, скин и ID таймера
+        let obsList = [], customSkin = null, rafId = null;
+
+        // Грузим рекорд из памяти браузера
+        let bestScore = parseInt(localStorage.getItem('ult_score')) || 0;
+
+        // Список цветов и условия их открытия
+        const colors = [
+            { hex: '#ffff00', req: 0 }, { hex: '#ffffff', req: 0 }, 
+            { hex: '#ff0000', req: 50 }, { hex: '#00ff00', req: 100 }, 
+            { hex: '#00ccff', req: 150 }, { hex: '#ff00ff', req: 200 }
+        ];
+        // Цвет кисти по умолчанию
+        let penColor = '#ffff00';
+
+        // Функция открытия игрового окна
+        function openGame() {
+            document.getElementById('game-view').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            showMenu();
+        }
+        // Функция закрытия игры
+        function closeGame() {
+            document.getElementById('game-view').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            stopLogic();
+        }
+
+        // Рисуем кнопочки цветов в редакторе
+        function initPalette() {
+            const pal = document.getElementById('color-palette');
+            pal.innerHTML = '';
+            colors.forEach(c => {
+                const s = document.createElement('div');
+                s.className = 'swatch';
+                s.style.background = c.hex;
+                // Если рекорд позволяет — открываем цвет
+                if (bestScore >= c.req) {
+                    s.onclick = () => { penColor = c.hex; };
+                } else { s.classList.add('locked'); }
+                pal.appendChild(s);
+            });
+        }
+
+        // Логика рисования пикселями
+        let isDrawing = false;
+        skinTool.onmousedown = () => isDrawing = true;
+        window.addEventListener('mouseup', () => isDrawing = false);
+        skinTool.onmousemove = (e) => {
+            if(!isDrawing) return;
+            const r = skinTool.getBoundingClientRect();
+            // Масштабируем клик под 16 пикселей
+            const x = Math.floor((e.clientX - r.left) / (r.width/16));
+            const y = Math.floor((e.clientY - r.top) / (r.height/16));
+            if(x>=0 && x<16 && y>=0 && y<16) { ctx.fillStyle = penColor; ctx.fillRect(x,y,1,1); }
+        };
+
+        // Открытие редактора
+        function openEditor() { 
+            document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden')); 
+            document.getElementById('editor-screen').classList.remove('hidden'); 
+            initPalette(); 
+        }
+
+        // Применяем скин к кубу
+        function applySkin() { 
+            customSkin = skinTool.toDataURL(); 
+            showMenu(); 
+        }
+
+        // Выход в главное меню
+        function showMenu() { 
+            stopLogic(); 
+            highScoreLabel.innerText = `РЕКОРД: ${bestScore}`; 
+            document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden')); 
+            document.getElementById('menu-screen').classList.remove('hidden'); 
+        }
+
+        // Кароче полная очистка перед стартом
+        function stopLogic() { 
+            runGame = false; 
+            if(rafId) cancelAnimationFrame(rafId); 
+            obsList.forEach(o => o.el.remove()); 
+            obsList = []; cY = 0; velY = 0; curScore = 0; frames = 0; miniMode = false; 
+            hudScore.innerText = "0"; resetSize(); 
+            // Вращение убрано — ставим 0
+            cube.style.transform = `rotate(0deg)`;
+        }
+
+        // Запуск геймплея
+        function startGame() { 
+            stopLogic(); 
+            document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden')); 
+            cube.style.background = customSkin ? `url(${customSkin})` : 'var(--u-yellow)'; 
+            cube.style.backgroundSize = 'cover'; 
+            runGame = true; 
+            rafId = requestAnimationFrame(gameLoop); 
+        }
+
+        // Переключение размера кубика
+        function resetSize() { 
+            const s = miniMode ? 25 : 50; 
+            cube.style.width = s+'px'; cube.style.height = s+'px'; 
+        }
+
+        // Создание препятствия в мире
+        function spawnObs(type, x, y, cls = '') {
+            const el = document.createElement('div'); 
+            el.className = `obstacle ${type} ${cls}`; 
+            el.style.left = x + 'px'; el.style.bottom = y + 'px'; 
+            document.getElementById('world-layer').appendChild(el);
+            const w = cls === 'block-bonus' ? 150 : 50; 
+            const h = type === 'portal' ? 120 : 50;
+            obsList.push({ el, type, x, y: y-80, w, h, active: true, bonus: false });
+        }
+
+        // ГЛАВНЫЙ ЦИКЛ ОБНОВЛЕНИЯ ИГРЫ
+        function gameLoop() {
+            if(!runGame) return;
+            // Кароче тут гравитация
+            velY -= (miniMode ? 0.7 : 0.9);
+            cY += velY;
+            let onGround = false;
+            // Если на полу
+            if(cY <= 0) { cY = 0; onGround = true; }
+            
+            // Хитбокс куба
+            const pSize = miniMode ? 25 : 50;
+            const pRect = { x: 150, y: cY, w: pSize, h: pSize };
+
+            // Двигаем все ловушки
+            for (let i = obsList.length - 1; i >= 0; i--) {
+                let o = obsList[i];
+                // Тут кароче скорость бега (4 пикселя за кадр)
+                o.x -= 4; 
+                o.el.style.left = o.x + 'px';
+                
+                // Удаляем если улетело за экран и даем очко
+                if (o.x < -200) { o.el.remove(); obsList.splice(i, 1); curScore++; hudScore.innerText = curScore; continue; }
+                
+                // ТУТ КАРОЧЕ ПРОВЕРКА СТОЛКНОВЕНИЙ
+                if (o.x < pRect.x + pRect.w && o.x + o.w > pRect.x && o.y < pRect.y + pRect.h && o.y + o.h > pRect.y) {
+                    
+                    // Влетели в портал
+                    if (o.type === 'portal' && o.active) { miniMode = !miniMode; resetSize(); o.active = false; o.el.style.opacity = 0.3; }
+                    
+                    // ПОПРАВЛЕННЫЕ ХИТБОКСЫ ШИПОВ
+                    else if (o.type === 'spike') {
+                        // Кароче делаем отступ чтоб не умирать от воздуха
+                        const padding = 12; 
+                        if (pRect.x + pRect.w > o.x + padding && 
+                            pRect.x < o.x + o.w - padding && 
+                            pRect.y < o.y + o.h - padding) {
+                            triggerDeath(); 
+                            return; 
+                        }
+                    }
+                    
+                    // Врезались в блок
+                    else if (o.type === 'block') {
+                        // Если упали сверху (приземлились)
+                        if (velY < 0 && pRect.y + 20 > o.y + o.h) {
+                            cY = o.y + o.h; velY = 0; onGround = true;
+                            // Если бонусный блок
+                            if (o.el.classList.contains('block-bonus') && !o.bonus) { curScore += 2; o.bonus = true; hudScore.innerText = curScore; o.el.style.background = "#00aa00"; }
+                        } else { triggerDeath(); return; } // Врезались сбоку
+                    }
+                }
+            }
+
+            // Логика прыжка
+            if (onGround) {
+                // Прыгаем если кнопка нажата
+                if (jumpHeld) velY = (miniMode ? 15 : 18);
+                // Вращение отключено по просьбе юзера
+                cube.style.transform = `rotate(0deg)`; 
+            } else { 
+                cube.style.transform = `rotate(0deg)`; 
+            }
+
+            // Двигаем куб в CSS
+            cube.style.bottom = (cY + 80) + 'px';
+            // Каждую секунду спавним ловушку
+            if (frames % 60 === 0) {
+                const x = window.innerWidth + 100;
+                const r = Math.random();
+                if (r < 0.1) spawnObs('portal', x, 80); 
+                else if (r < 0.3) spawnObs('block', x, 180); 
+                else if (r < 0.45) spawnObs('block', x, 160, 'block-bonus'); 
+                else spawnObs('spike', x, 80);
+            }
+            // Считаем кадры
+            frames++;
+            // Следующий кадр
+            rafId = requestAnimationFrame(gameLoop);
+        }
+
+        // Если проиграл
+        function triggerDeath() {
+            runGame = false;
+            if (curScore > bestScore) { bestScore = curScore; localStorage.setItem('ult_score', bestScore); }
+            document.getElementById('final-res').innerText = curScore;
+            document.getElementById('game-over-screen').classList.remove('hidden');
+        }
+
+        // Кароче слушаем нажатия для прыжка
+        const handleJump = (e) => {
+            if(e.target.tagName === 'BUTTON') return;
+            if(e.type === 'keydown' && e.code !== 'Space' && e.code !== 'ArrowUp') return;
+            jumpHeld = true;
+        };
+        // Управление клавиатурой
+        window.addEventListener('keydown', handleJump);
+        window.addEventListener('keyup', () => jumpHeld = false);
+        // Управление мышкой/тачем
+        window.addEventListener('mousedown', handleJump);
+        window.addEventListener('mouseup', () => jumpHeld = false);
+    </script>
+</body>
+</html>

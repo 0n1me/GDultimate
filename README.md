@@ -1,2 +1,0 @@
-# GDultimate.github.io
-gdULT
