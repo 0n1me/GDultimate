@@ -28,170 +28,6 @@
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
-            /* ИСПРАВЛЕНО: manipulation разрешает клики и скролл, но убирает задержку */
-            touch-action: manipulation; 
-            line-height: 1.5;
-        }
-
-        .navbar {
-            background: rgba(2, 5, 10, 0.95);
-            border-bottom: 1px solid var(--border-color);
-            padding: 20px 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-        }
-
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-        .nav-content { display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 24px; font-weight: 900; color: white; letter-spacing: 1px; }
-        .logo span { color: var(--u-cyan); }
-
-        .btn-main {
-            background: linear-gradient(45deg, var(--u-cyan), #00ccff);
-            color: black;
-            padding: 12px 25px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 800;
-            font-size: 16px;
-            display: inline-block;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
-            transition: 0.3s;
-            border: none;
-            cursor: pointer;
-            text-transform: uppercase;
-            -webkit-tap-highlight-color: transparent;
-            position: relative; /* Чтобы z-index работал корректно */
-            z-index: 10;
-        }
-        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 0 25px var(--u-cyan); }
-        .btn-main:active { transform: scale(0.95); }
-
-        .hero {
-            padding: 180px 0 120px;
-            background: radial-gradient(circle at top center, #1a2035 0%, var(--bg-body) 70%);
-            display: flex; align-items: center;
-        }
-
-        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-        .hero h1 { font-size: 48px; line-height: 1.1; margin-bottom: 20px; }
-        .hero p { color: var(--text-muted); font-size: 18px; margin-bottom: 30px; max-width: 450px; }
-        .hero img { width: 100%; max-width: 550px; height: auto; filter: drop-shadow(0 0 20px rgba(0, 255, 204, 0.5)); }
-
-        @media (max-width: 768px) {
-            .hero { padding: 120px 0 60px; }
-            .hero-grid { grid-template-columns: 1fr; text-align: center; gap: 40px; }
-            .hero p { margin: 0 auto 30px auto; }
-            .hero h1 { font-size: 36px; }
-            .hero img { max-width: 80%; margin: 0 auto; }
-            .comparison-card { overflow-x: auto; }
-            .comp-table th, .comp-table td { padding: 15px; font-size: 14px; }
-            #cube { left: 10% !important; } 
-            #hud-score { right: 20px; font-size: 36px; top: 20px; }
-        }
-
-        .section-title { text-align: center; font-size: 36px; font-weight: 800; margin-bottom: 60px; color: white; }
-        .comparison-section { padding: 80px 0; background: var(--bg-body); }
-        .comparison-card { background: var(--bg-card); border-radius: 16px; padding: 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow: hidden; }
-        .comp-table { width: 100%; border-collapse: collapse; }
-        .comp-table th, .comp-table td { padding: 25px 30px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        .comp-table tr:last-child td { border-bottom: none; }
-        .comp-table th { font-size: 18px; font-weight: 700; color: white; }
-        .th-highlight { color: var(--accent-blue) !important; font-size: 20px; } 
-        .comp-table td { font-size: 16px; color: var(--text-muted); }
-        .td-success { color: var(--accent-green) !important; font-weight: 600; }
-
-        /* ИГРОВЫЕ СТИЛИ */
-        #game-view {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #222; z-index: 1000; display: none;
-            /* ИСПРАВЛЕНО: Блокируем жесты ТОЛЬКО внутри игры */
-            touch-action: none; 
-        }
-        .screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center;
-            align-items: center; background: rgba(0, 0, 0, 0.85); z-index: 1020;
-        }
-        .hidden { display: none !important; }
-        #world-layer { width: 100%; height: 100%; background: linear-gradient(to bottom, #1a0b2e, #4a195c); position: relative; overflow: hidden; }
-        #bg-grid { position: absolute; width: 200%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 50px 50px; }
-        #floor { position: absolute; bottom: 0; width: 100%; height: 80px; background: #111; border-top: 4px solid var(--u-cyan); z-index: 1010; }
-        #cube { width: 50px; height: 50px; position: absolute; bottom: 80px; left: 15%; z-index: 1015; background-color: var(--u-yellow); border: 3px solid #000; box-sizing: border-box; }
-        
-        .obstacle { position: absolute; z-index: 1005; }
-        .spike { width: 0; height: 0; border-left: 25px solid transparent; border-right: 25px solid transparent; border-bottom: 50px solid var(--u-red); bottom: 80px; }
-        .portal { width: 50px; height: 120px; border: 4px solid #d0f; bottom: 80px; border-radius: 12px; background: rgba(200, 0, 255, 0.2); box-shadow: 0 0 20px #d0f; }
-        .block { width: 50px; height: 50px; background: #444; border: 3px solid #fff; box-sizing: border-box; }
-        .block-bonus { width: 150px; background: #554400; border: 4px solid #ffcc00; display: flex; justify-content: center; align-items: center; font-weight: bold; color: #ffcc00; }
-        .block-bonus::after { content: "+2 PTS"; font-size: 14px; }
-        #hud-score { position: absolute; top: 30px; right: 50px; font-size: 48px; font-weight: 900; z-index: 1025; color: white; text-shadow: 2px 2px 4px black; }
-        .swatch { width: 40px; height: 40px; border: 2px solid #fff; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-        .swatch.locked { cursor: not-allowed; opacity: 0.3; background: #333 !important; }
-        
-        footer { padding: 40px; text-align: center; border-top: 1px solid var(--border-color); color: var(--text-muted); background: var(--bg-body); }
-    </style>
-</head>
-<body>
-
-    <header class="navbar">
-        <div class="container nav-content">
-            <div class="logo">GD<span>ULTIMATE</span></div>
-            <button class="btn-main" style="padding: 10px 20px; font-size: 14px;" onclick="openGame()">ИГРАТЬ</button>
-        </div>
-    </header>
-
-    <section class="hero">
-        <div class="container hero-grid">
-            <div>
-                <h1 style="color: var(--u-cyan);">GD Ultimate </h1>
-                <p>Твоя любимая игра теперь с редактором скинов, порталами и хардкорными уровнями прямо в браузере. 
-(Специально для Владислава Зыкина была добавленна поддержка айфонов)</p>
-                <button class="btn-main" onclick="openGame()">ЗАПУСТИТЬ</button>
-            </div>
-            <div style="text-align: center;">
-                <img src="https://i.imgur.com/YPGuTAQ.png" alt="GD Ultimate">
-            </div>
-        </div>
-    </section>
-
-    <section class="comparison-section">
-        <div class="container">
-            <h2 class="section-title">Особенности</h2>
-            <div class="comparison-card">
-                <table class="comp-table"><!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>GD Ultimate Edition</title>
-    <style>
-        :root {
-            --u-cyan: #00ffcc;
-            --u-purple: #4a195c;
-            --bg-body: #02050a;
-            --bg-card: #0b1120;
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --accent-green: #22c55e;
-            --accent-blue: #3b82f6;
-            --border-color: #1e293b;
-            --u-yellow: #ffff00;
-            --u-red: #ff1100;
-        }
-
-        body {
-            margin: 0;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            overflow-x: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
             touch-action: manipulation; 
             line-height: 1.5;
         }
@@ -277,21 +113,38 @@
         #game-view {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #222; z-index: 1000; display: none;
-            touch-action: none; /* Важно: отключает зум и скролл внутри игры */
-            outline: none; /* Убираем рамку фокуса на Android TV/ПК */
+            touch-action: none; 
+            outline: none; 
         }
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center;
             align-items: center; background: rgba(0, 0, 0, 0.85); z-index: 1020;
-            pointer-events: auto; /* Возвращаем клики интерфейсу */
+            pointer-events: auto; 
         }
         .hidden { display: none !important; }
         #world-layer { width: 100%; height: 100%; background: linear-gradient(to bottom, #1a0b2e, #4a195c); position: relative; overflow: hidden; }
         #bg-grid { position: absolute; width: 200%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 50px 50px; }
         #floor { position: absolute; bottom: 0; width: 100%; height: 80px; background: #111; border-top: 4px solid var(--u-cyan); z-index: 1010; }
-        #cube { width: 50px; height: 50px; position: absolute; bottom: 80px; left: 15%; z-index: 1015; background-color: var(--u-yellow); border: 3px solid #000; box-sizing: border-box; will-change: transform, bottom; }
         
+        #cube { 
+            width: 50px; height: 50px; 
+            position: absolute; bottom: 80px; left: 15%; z-index: 1015; 
+            background-color: var(--u-yellow); border: 3px solid #000; 
+            box-sizing: border-box; 
+            will-change: bottom; 
+            transition: box-shadow 0.2s; /* Плавное включение свечения */
+        }
+        
+        /* Стили для частиц (след) */
+        .particle {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            z-index: 1014; /* Чуть ниже куба */
+            pointer-events: none;
+        }
+
         .obstacle { position: absolute; z-index: 1005; will-change: left; }
         .spike { width: 0; height: 0; border-left: 25px solid transparent; border-right: 25px solid transparent; border-bottom: 50px solid var(--u-red); bottom: 80px; }
         .portal { width: 50px; height: 120px; border: 4px solid #d0f; bottom: 80px; border-radius: 12px; background: rgba(200, 0, 255, 0.2); box-shadow: 0 0 20px #d0f; }
@@ -394,340 +247,17 @@
         const hudScore = document.getElementById('hud-score');
         const highScoreLabel = document.getElementById('high-score-label');
         const skinTool = document.getElementById('skin-tool');
-        const gameView = document.getElementById('game-view');
         const ctx = skinTool.getContext('2d');
-
-        let runGame = false, miniMode = false, jumpHeld = false;
-        let cY = 0, velY = 0, curScore = 0;
-        let obsList = [], customSkin = null, rafId = null;
-        let bestScore = parseInt(localStorage.getItem('ult_score')) || 0;
-        
-        // Для Delta Time
-        let lastTime = 0;
-        let spawnTimer = 0;
-
-        const colors = [
-            { hex: '#ffff00', req: 0 }, { hex: '#ffffff', req: 0 }, 
-            { hex: '#ff0000', req: 50 }, { hex: '#00ff00', req: 100 }, 
-            { hex: '#00ccff', req: 150 }, { hex: '#ff00ff', req: 200 }
-        ];
-        let penColor = '#ffff00';
-
-        function openGame() {
-            gameView.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            showMenu();
-        }
-        function closeGame() {
-            gameView.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            stopLogic();
-        }
-
-        function initPalette() {
-            const pal = document.getElementById('color-palette');
-            pal.innerHTML = '';
-            colors.forEach(c => {
-                const s = document.createElement('div');
-                s.className = 'swatch';
-                s.style.background = c.hex;
-                if (bestScore >= c.req) {
-                    s.onclick = () => { penColor = c.hex; };
-                } else { s.classList.add('locked'); }
-                pal.appendChild(s);
-            });
-        }
-
-        // РИСОВАНИЕ
-        let isDrawing = false;
-        
-        function getPos(e) {
-            const r = skinTool.getBoundingClientRect();
-            let clientX = e.clientX;
-            let clientY = e.clientY;
-            if(e.touches && e.touches.length > 0) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            }
-            return {
-                x: Math.floor((clientX - r.left) / (r.width/16)),
-                y: Math.floor((clientY - r.top) / (r.height/16))
-            };
-        }
-
-        function drawPixel(e) {
-            if(!isDrawing) return;
-            // Убираем preventDefault для возможности скролла, если не рисуем
-            // Но в канвасе нам надо рисовать:
-            if(e.type === 'touchmove') e.preventDefault(); 
-            
-            const pos = getPos(e);
-            if(pos.x>=0 && pos.x<16 && pos.y>=0 && pos.y<16) { 
-                ctx.fillStyle = penColor; 
-                ctx.fillRect(pos.x, pos.y, 1, 1); 
-            }
-        }
-
-        skinTool.addEventListener('mousedown', (e) => { isDrawing = true; drawPixel(e); });
-        window.addEventListener('mouseup', () => isDrawing = false);
-        skinTool.addEventListener('mousemove', drawPixel);
-        skinTool.addEventListener('touchstart', (e) => { isDrawing = true; drawPixel(e); }, {passive: false});
-        skinTool.addEventListener('touchend', () => isDrawing = false);
-        skinTool.addEventListener('touchmove', drawPixel, {passive: false});
-
-        function openEditor() { 
-            document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden')); 
-            document.getElementById('editor-screen').classList.remove('hidden'); 
-            initPalette(); 
-        }
-
-        function applySkin() { 
-            customSkin = skinTool.toDataURL(); 
-            showMenu(); 
-        }
-
-        function showMenu() { 
-            stopLogic(); 
-            highScoreLabel.innerText = `РЕКОРД: ${bestScore}`; 
-            document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden')); 
-            document.getElementById('menu-screen').classList.remove('hidden'); 
-        }
-
-        function stopLogic() { 
-            runGame = false; 
-            if(rafId) cancelAnimationFrame(rafId); 
-            obsList.forEach(o => o.el.remove()); 
-            obsList = []; cY = 0; velY = 0; curScore = 0; miniMode = false; 
-            hudScore.innerText = "0"; resetSize(); 
-            cube.style.transform = `rotate(0deg)`;
-            lastTime = 0; // Сброс времени
-        }
-
-        function startGame() { 
-            stopLogic(); 
-            document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden')); 
-            cube.style.background = customSkin ? `url(${customSkin})` : 'var(--u-yellow)'; 
-            cube.style.backgroundSize = 'cover'; 
-            runGame = true; 
-            lastTime = performance.now(); // Инициализация времени
-            spawnTimer = 0;
-            rafId = requestAnimationFrame(gameLoop); 
-            
-            // Фокус на игру для клавиатуры
-            gameView.focus();
-        }
-
-        function resetSize() { 
-            const s = miniMode ? 25 : 50; 
-            cube.style.width = s+'px'; cube.style.height = s+'px'; 
-        }
-
-        function spawnObs(type, x, y, cls = '') {
-            const el = document.createElement('div'); 
-            el.className = `obstacle ${type} ${cls}`; 
-            el.style.left = x + 'px'; el.style.bottom = y + 'px'; 
-            document.getElementById('world-layer').appendChild(el);
-            const w = cls === 'block-bonus' ? 150 : 50; 
-            const h = type === 'portal' ? 120 : 50;
-            obsList.push({ el, type, x, y: y-80, w, h, active: true, bonus: false });
-        }
-
-        // --- ГЛАВНЫЙ ЦИКЛ С DELTA TIME ---
-        function gameLoop(timestamp) {
-            if(!runGame) return;
-
-            // Расчет Delta Time
-            if (!lastTime) lastTime = timestamp;
-            const deltaTime = timestamp - lastTime;
-            lastTime = timestamp;
-
-            // Коэффициент нормализации (1.0 = 60 FPS)
-            // Если лагает (30 FPS), factor будет 2.0, и объекты сдвинутся дальше
-            const timeFactor = deltaTime / (1000 / 60);
-
-            // Ограничение (чтобы при переключении вкладок не улетало)
-            if (timeFactor > 4) {
-                rafId = requestAnimationFrame(gameLoop);
-                return; 
-            }
-
-            // Физика гравитации с учетом времени
-            velY -= (miniMode ? 0.7 : 0.9) * timeFactor;
-            cY += velY * timeFactor;
-            
-            let onGround = false;
-            if(cY <= 0) { cY = 0; onGround = true; }
-            
-            const pSize = miniMode ? 25 : 50;
-            const pX = window.innerWidth * 0.15;
-            const pRect = { x: pX, y: cY, w: pSize, h: pSize };
-
-            for (let i = obsList.length - 1; i >= 0; i--) {
-                let o = obsList[i];
-                // Скорость тоже зависит от timeFactor
-                let baseSpeed = 5 + (curScore * 0.05);
-                let speed = baseSpeed * timeFactor;
-                
-                o.x -= speed; 
-                o.el.style.left = o.x + 'px';
-                
-                if (o.x < -200) { o.el.remove(); obsList.splice(i, 1); curScore++; hudScore.innerText = curScore; continue; }
-                
-                // Коллизия (без изменений)
-                if (o.x < pRect.x + pRect.w && o.x + o.w > pRect.x && o.y < pRect.y + pRect.h && o.y + o.h > pRect.y) {
-                    if (o.type === 'portal' && o.active) { miniMode = !miniMode; resetSize(); o.active = false; o.el.style.opacity = 0.3; }
-                    else if (o.type === 'spike') {
-                        const padding = 12; 
-                        if (pRect.x + pRect.w > o.x + padding && pRect.x < o.x + o.w - padding && pRect.y < o.y + o.h - padding) {
-                            triggerDeath(); return; 
-                        }
-                    }
-                    else if (o.type === 'block') {
-                        // Проверка "сверху" тоже должна учитывать большую скорость падения
-                        if (velY < 0 && pRect.y + (20 * timeFactor) > o.y + o.h) {
-                            cY = o.y + o.h; velY = 0; onGround = true;
-                            if (o.el.classList.contains('block-bonus') && !o.bonus) { curScore += 2; o.bonus = true; hudScore.innerText = curScore; o.el.style.background = "#00aa00"; }
-                        } else { triggerDeath(); return; } 
-                    }
-                }
-            }
-
-            if (onGround) {
-                if (jumpHeld) velY = (miniMode ? 15 : 18);
-                cube.style.transform = `rotate(0deg)`; 
-            } else { cube.style.transform = `rotate(0deg)`; }
-
-            cube.style.bottom = (cY + 80) + 'px';
-            
-            // Спавн по времени, а не по кадрам
-            spawnTimer += deltaTime;
-            if (spawnTimer > 1000) { // Каждую 1 секунду (примерно)
-                spawnTimer = 0;
-                const x = window.innerWidth + 100;
-                const r = Math.random();
-                if (r < 0.1) spawnObs('portal', x, 80); 
-                else if (r < 0.3) spawnObs('block', x, 180); 
-                else if (r < 0.45) spawnObs('block', x, 160, 'block-bonus'); 
-                else spawnObs('spike', x, 80);
-            }
-            
-            rafId = requestAnimationFrame(gameLoop);
-        }
-
-        function triggerDeath() {
-            runGame = false;
-            if (curScore > bestScore) { bestScore = curScore; localStorage.setItem('ult_score', bestScore); }
-            document.getElementById('final-res').innerText = curScore;
-            document.getElementById('game-over-screen').classList.remove('hidden');
-        }
-
-        /* --- НОВОЕ УПРАВЛЕНИЕ (Изолированное) --- */
-        
-        const handleInputStart = (e) => {
-            // Если кликнули по кнопке интерфейса (меню, пауза и т.д.) - игнорируем прыжок
-            if(e.target.closest('button') || e.target.closest('.swatch')) return;
-            
-            // Если игра не запущена - выходим (не блокируем стандартные клики)
-            if(!runGame) return;
-
-            // Блокируем стандартное поведение (скролл, зум) только ВНУТРИ игры
-            if(e.cancelable) e.preventDefault();
-            
-            jumpHeld = true;
-        };
-
-        const handleInputEnd = (e) => {
-             jumpHeld = false;
-        };
-
-        // Вешаем слушатели ТОЛЬКО на контейнер игры, а не на весь Window
-        // Это чинит кнопки на лендинге
-        const gameLayer = document.getElementById('game-view');
-
-        gameLayer.addEventListener('touchstart', handleInputStart, { passive: false });
-        gameLayer.addEventListener('touchend', handleInputEnd, { passive: false });
-        gameLayer.addEventListener('mousedown', handleInputStart);
-        gameLayer.addEventListener('mouseup', handleInputEnd);
-        
-        // Клавиатура остается на window, но работает только если игра активна
-        window.addEventListener('keydown', (e) => {
-            if(!runGame) return;
-            if(e.code === 'Space' || e.code === 'ArrowUp') {
-                jumpHeld = true;
-            }
-        });
-        window.addEventListener('keyup', () => jumpHeld = false);
-
-    </script>
-</body>
-</html>
-                    <thead>
-                        <tr>
-                            <th>Функция</th>
-                            <th>Обычный веб</th>
-                            <th class="th-highlight">GD Ultimate</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Управление</td><td>Мышь / Пробел</td><td class="td-success">Touch / Multi-touch</td></tr>
-                        <tr><td>Физика</td><td>Дерганая</td><td class="td-success">Плавные 60 FPS</td></tr>
-                        <tr><td>Интерфейс</td><td>Только ПК</td><td class="td-success">Полный адаптив</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <div id="game-view">
-        <div id="world-layer">
-            <div id="bg-grid"></div>
-            <div id="hud-score">0</div>
-            <div id="cube"></div>
-            <div id="floor"></div>
-        </div>
-
-        <div id="menu-screen" class="screen">
-            <h1 style="font-size: 60px; margin-bottom: 20px; color:white; text-align:center; line-height:1;">GD<br>ULTIMATE</h1>
-            <button class="btn-main" style="font-size: 30px; margin-bottom: 20px;" onclick="startGame()">ИГРАТЬ</button>
-            <div style="display: flex; gap: 20px;">
-                <button class="btn-main" style="background: var(--u-purple); color: white;" onclick="openEditor()">СКИНЫ</button>
-                <button class="btn-main" style="background: #555; color: white;" onclick="closeGame()">ВЫЙТИ</button>
-            </div>
-            <div id="high-score-label" style="margin-top: 20px; color: var(--u-cyan); font-weight: bold;">РЕКОРД: 0</div>
-        </div>
-
-        <div id="game-over-screen" class="screen hidden">
-            <h1 style="color: var(--u-red); font-size: 50px;">GAME OVER</h1>
-            <p style="font-size: 24px; color:white;">Счет: <span id="final-res">0</span></p>
-            <button class="btn-main" onclick="startGame()">ЗАНОВО</button>
-            <button class="btn-main" style="background: #333; color: white; margin-top:10px;" onclick="showMenu()">В МЕНЮ</button>
-        </div>
-
-        <div id="editor-screen" class="screen hidden">
-            <h2 style="color:white;">РЕДАКТОР</h2>
-            <p style="color:#aaa; font-size:14px; margin-bottom:5px;">(Рисуй пальцем или мышкой)</p>
-            <canvas id="skin-tool" width="16" height="16" style="width: 200px; height: 200px; image-rendering: pixelated; border: 4px solid var(--u-cyan); background: #000; touch-action: none;"></canvas>
-            <div id="color-palette" style="display:flex; gap:10px; margin: 20px 0; flex-wrap: wrap; justify-content: center;"></div>
-            <button class="btn-main" onclick="applySkin()">СОХРАНИТЬ</button>
-            <button class="btn-main" style="background: #333; color: white; margin-top: 10px;" onclick="showMenu()">ОТМЕНА</button>
-        </div>
-    </div>
-
-    <footer>
-        <p>© GD Ultimate Edition. Mobile Ready.</p>
-    </footer>
-
-    <script>
-        const cube = document.getElementById('cube');
-        const hudScore = document.getElementById('hud-score');
-        const highScoreLabel = document.getElementById('high-score-label');
-        const skinTool = document.getElementById('skin-tool');
-        const ctx = skinTool.getContext('2d');
+        const worldLayer = document.getElementById('world-layer');
 
         let runGame = false, miniMode = false, jumpHeld = false;
         let cY = 0, velY = 0, curScore = 0, frames = 0;
         let obsList = [], customSkin = null, rafId = null;
         let bestScore = parseInt(localStorage.getItem('ult_score')) || 0;
+        
+        let curRotation = 0; 
+        let particles = []; 
+        let godMode = false; // Переменная бессмертия
 
         const colors = [
             { hex: '#ffff00', req: 0 }, { hex: '#ffffff', req: 0 }, 
@@ -763,7 +293,6 @@
 
         // РИСОВАНИЕ
         let isDrawing = false;
-        
         function getPos(e) {
             const r = skinTool.getBoundingClientRect();
             let clientX = e.clientX;
@@ -817,9 +346,15 @@
             runGame = false; 
             if(rafId) cancelAnimationFrame(rafId); 
             obsList.forEach(o => o.el.remove()); 
-            obsList = []; cY = 0; velY = 0; curScore = 0; frames = 0; miniMode = false; 
+            particles.forEach(p => p.el.remove()); 
+            obsList = []; particles = [];
+            cY = 0; velY = 0; curScore = 0; frames = 0; miniMode = false; curRotation = 0;
             hudScore.innerText = "0"; resetSize(); 
             cube.style.transform = `rotate(0deg)`;
+            
+            // Сброс бессмертия при выходе
+            godMode = false;
+            cube.style.boxShadow = 'none';
         }
 
         function startGame() { 
@@ -840,26 +375,59 @@
             const el = document.createElement('div'); 
             el.className = `obstacle ${type} ${cls}`; 
             el.style.left = x + 'px'; el.style.bottom = y + 'px'; 
-            document.getElementById('world-layer').appendChild(el);
+            worldLayer.appendChild(el);
             const w = cls === 'block-bonus' ? 150 : 50; 
             const h = type === 'portal' ? 120 : 50;
             obsList.push({ el, type, x, y: y-80, w, h, active: true, bonus: false });
         }
 
+        // === СИСТЕМА ЧАСТИЦ ===
+        function spawnParticle(x, y) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 6 + 4;
+            p.style.width = size + 'px'; p.style.height = size + 'px';
+            p.style.left = x + 'px'; 
+            p.style.bottom = y + 'px';
+            worldLayer.appendChild(p);
+            particles.push({ el: p, x: x, opacity: 1.0 });
+        }
+
+        function updateParticles(speed) {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x -= speed; 
+                p.opacity -= 0.05; 
+                
+                if (p.opacity <= 0) {
+                    p.el.remove();
+                    particles.splice(i, 1);
+                } else {
+                    p.el.style.left = p.x + 'px';
+                    p.el.style.opacity = p.opacity;
+                }
+            }
+        }
+
         function gameLoop() {
             if(!runGame) return;
+            
             velY -= (miniMode ? 0.7 : 0.9);
             cY += velY;
             let onGround = false;
+            
             if(cY <= 0) { cY = 0; onGround = true; }
             
             const pSize = miniMode ? 25 : 50;
-            const pX = window.innerWidth * 0.15;
-            const pRect = { x: pX, y: cY, w: pSize, h: pSize };
+            const cubeScreenX = window.innerWidth * 0.15;
+            let particleX = 0;
+            if(cube.offsetLeft) particleX = cube.offsetLeft;
+
+            const pRect = { x: cubeScreenX, y: cY, w: pSize, h: pSize };
+            const speed = 5 + (curScore * 0.05);
 
             for (let i = obsList.length - 1; i >= 0; i--) {
                 let o = obsList[i];
-                let speed = 5 + (curScore * 0.05);
                 o.x -= speed; 
                 o.el.style.left = o.x + 'px';
                 
@@ -870,22 +438,34 @@
                     else if (o.type === 'spike') {
                         const padding = 12; 
                         if (pRect.x + pRect.w > o.x + padding && pRect.x < o.x + o.w - padding && pRect.y < o.y + o.h - padding) {
-                            triggerDeath(); return; 
+                            if (!godMode) { triggerDeath(); return; } // GOD MODE CHECK
                         }
                     }
                     else if (o.type === 'block') {
                         if (velY < 0 && pRect.y + 20 > o.y + o.h) {
                             cY = o.y + o.h; velY = 0; onGround = true;
                             if (o.el.classList.contains('block-bonus') && !o.bonus) { curScore += 2; o.bonus = true; hudScore.innerText = curScore; o.el.style.background = "#00aa00"; }
-                        } else { triggerDeath(); return; } 
+                        } else { 
+                            if (!godMode) { triggerDeath(); return; } // GOD MODE CHECK
+                        } 
                     }
                 }
             }
 
+            // === АНИМАЦИЯ ===
             if (onGround) {
                 if (jumpHeld) velY = (miniMode ? 15 : 18);
-                cube.style.transform = `rotate(0deg)`; 
-            } else { cube.style.transform = `rotate(0deg)`; }
+                
+                const snap = Math.round(curRotation / 90) * 90;
+                curRotation = curRotation + (snap - curRotation) * 0.2;
+
+                if (frames % 4 === 0) spawnParticle(particleX, cY + 80);
+            } else { 
+                curRotation += 6; 
+            }
+            cube.style.transform = `rotate(${curRotation}deg)`;
+
+            updateParticles(speed);
 
             cube.style.bottom = (cY + 80) + 'px';
             if (frames % 60 === 0) {
@@ -907,37 +487,41 @@
             document.getElementById('game-over-screen').classList.remove('hidden');
         }
 
-        /* --- ИСПРАВЛЕННОЕ УПРАВЛЕНИЕ --- */
-        
+        /* --- УПРАВЛЕНИЕ --- */
         const startJump = (e) => {
-            // 1. Ищем кнопку (даже если нажали на span внутри кнопки)
-            // Если это кнопка, мы выходим из функции и даем браузеру сделать клик
             if(e.target.closest('button')) return;
-
-            // 2. Если игра НЕ идет, ничего не блокируем (чтобы можно было выделять текст и скроллить)
             if(!runGame) return;
 
-            // 3. Если игра ИДЕТ: блокируем действия браузера и прыгаем
-            if(e.type === 'touchstart') e.preventDefault();
+            // GOD MODE ACTIVATION (Только клавиатура)
+            if (e.code === 'KeyL' && e.type === 'keydown') {
+                godMode = true;
+                cube.style.boxShadow = '0 0 25px 10px white'; // Свечение
+                return;
+            }
 
+            if(e.type === 'touchstart') e.preventDefault();
             if(e.type === 'keydown' && e.code !== 'Space' && e.code !== 'ArrowUp') return;
             jumpHeld = true;
         };
 
         const endJump = (e) => {
+             // GOD MODE DEACTIVATION
+             if (e.code === 'KeyL' && e.type === 'keyup') {
+                godMode = false;
+                cube.style.boxShadow = 'none';
+                return;
+            }
+
              if(e.type === 'touchend') {
-                 // Тут тоже надо проверить, не кнопка ли это
                  if(!e.target.closest('button')) e.preventDefault();
              }
              jumpHeld = false;
         };
 
         window.addEventListener('keydown', startJump);
-        window.addEventListener('keyup', () => jumpHeld = false);
+        window.addEventListener('keyup', endJump);
         window.addEventListener('mousedown', startJump);
         window.addEventListener('mouseup', () => jumpHeld = false);
-        
-        // Passive: false нужен, чтобы работал e.preventDefault()
         window.addEventListener('touchstart', startJump, { passive: false });
         window.addEventListener('touchend', endJump, { passive: false });
 
