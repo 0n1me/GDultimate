@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GD ULTIMATE EDITION — Browser Game</title>
+    <meta name="description"
+        content="GD Ultimate Edition — Geometry Dash в браузере. Шипы, порталы, редактор скинов. Прыгай или умри." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ─── TOKENS ─────────────────────────────────── */
+        :root {
+            --neon: #ffe000;
+            --neon2: #ff6b00;
+            --cyan: #00ffcc;
+            --purple: #b44fff;
+            --bg: #010308;
+            --bg2: #080c18;
+            --card: #0b1020;
+            --border: rgba(255, 224, 0, 0.18);
+            --text: #e8eaf6;
+            --muted: #7b8ab8;
+            --font: 'Orbitron', sans-serif;
+            --mono: 'Share Tech Mono', monospace;
+        }
+
+        /* ─── RESET ──────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ─── SCANLINES ──────────────────────────────── */
+        .scanlines {
+            pointer-events: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: repeating-linear-gradient(to bottom,
+                    transparent 0px,
+                    transparent 3px,
+                    rgba(0, 0, 0, 0.08) 3px,
+                    rgba(0, 0, 0, 0.08) 4px);
+        }
+
+        /* ─── NAVBAR ─────────────────────────────────── */
+        #navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 500;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(1, 3, 8, 0.85);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(14px);
+        }
+
+        #nav-logo {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: .12em;
+            color: var(--neon);
+            text-shadow: 0 0 14px var(--neon);
+        }
+
+        #nav-logo svg {
+            flex-shrink: 0;
+        }
+
+        /* ─── BUTTONS ────────────────────────────────── */
+        .btn-neon {
+            font-family: var(--font);
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            padding: .65rem 1.5rem;
+            background: transparent;
+            color: var(--neon);
+            border: 1px solid var(--neon);
+            box-shadow: 0 0 10px rgba(255, 224, 0, .25);
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background .2s, box-shadow .2s, transform .1s;
+        }
+
+        .btn-neon:hover {
+            background: rgba(255, 224, 0, .12);
+            box-shadow: 0 0 22px rgba(255, 224, 0, .55);
+        }
+
+        .btn-neon:active {
+            transform: scale(.96);
+        }
+
+        .btn-lg {
+            font-size: .9rem;
+            padding: .85rem 2.4rem;
+        }
+
+        .btn-cyan {
+            color: var(--cyan);
+            border-color: var(--cyan);
+            box-shadow: 0 0 10px rgba(0, 255, 204, .25);
+        }
+
+        .btn-cyan:hover {
+            background: rgba(0, 255, 204, .12);
+            box-shadow: 0 0 22px rgba(0, 255, 204, .5);
+        }
+
+        /* ─── HERO ───────────────────────────────────── */
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 7rem 1.5rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #hero-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: .45;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 780px;
+        }
+
+        #hero-badge {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: .7rem;
+            letter-spacing: .18em;
+            color: var(--neon);
+            border: 1px solid var(--border);
+            padding: .3rem .9rem;
+            margin-bottom: 1.8rem;
+        }
+
+        #hero-title {
+            font-size: clamp(2.8rem, 8vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: var(--neon);
+            text-shadow: 0 0 30px rgba(255, 224, 0, .6), 0 0 60px rgba(255, 224, 0, .3);
+            margin-bottom: 1.5rem;
+        }
+
+        #hero-title span {
+            color: #fff;
+        }
+
+        #hero-sub {
+            font-size: 1rem;
+            color: var(--muted);
+            margin-bottom: 2.5rem;
+            font-family: var(--mono);
+            letter-spacing: .06em;
+            max-width: 560px;
+            margin-inline: auto;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ─── LIVE PREVIEW BOX ───────────────────────── */
+        #preview-box {
+            margin: 4rem auto 0;
+            width: min(90%, 580px);
+            aspect-ratio: 2/1;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: linear-gradient(to bottom, #08041a, #150b35);
+            box-shadow: 0 0 40px rgba(255, 224, 0, .12);
+        }
+
+        #preview-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, .03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, .03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridScroll 2s linear infinite;
+        }
+
+        @keyframes gridScroll {
+            to {
+                background-position: -40px 0;
+            }
+        }
+
+        #preview-floor {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 28%;
+            background: #0c0820;
+            border-top: 3px solid var(--neon);
+        }
+
+        #preview-cube {
+            position: absolute;
+            bottom: 28%;
+            left: 14%;
+            width: 48px;
+            height: 48px;
+            background: var(--neon);
+            border: 3px solid #000;
+            animation: cubeJump 1.4s ease-in-out infinite;
+        }
+
+        @keyframes cubeJump {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            30% {
+                transform: translateY(-70px) rotate(90deg);
+            }
+
+            55% {
+                transform: translateY(-70px) rotate(180deg);
+            }
+
+            80% {
+                transform: translateY(0) rotate(270deg);
+            }
+        }
+
+        .preview-spike {
+            position: absolute;
+            bottom: 28%;
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-bottom: 38px solid #ff2200;
+            animation: spikeMove 2s linear infinite;
+        }
+
+        .preview-spike:nth-child(1) {
+            animation-delay: 0s;
+            left: 60%;
+        }
+
+        .preview-spike:nth-child(2) {
+            animation-delay: 0.9s;
+            left: 80%;
+        }
+
+        @keyframes spikeMove {
+            from {
+                left: 110%;
+            }
+
+            to {
+                left: -10%;
+            }
+        }
+
+        .preview-portal {
+            position: absolute;
+            bottom: 28%;
+            width: 36px;
+            height: 80px;
+            border: 3px solid #cc00ff;
+            border-radius: 8px;
+            background: rgba(200, 0, 255, .18);
+            box-shadow: 0 0 14px #cc00ff;
+            animation: portalMove 3.5s linear infinite;
+            left: 130%;
+        }
+
+        @keyframes portalMove {
+            from {
+                left: 130%;
+            }
+
+            to {
+                left: -10%;
+            }
+        }
+
+        /* ─── SECTION COMMON ─────────────────────────── */
+        section {
+            padding: 6rem 1.5rem;
+        }
+
+        .section-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: clamp(1.4rem, 4vw, 2.1rem);
+            font-weight: 900;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--neon);
+            text-shadow: 0 0 20px rgba(255, 224, 0, .4);
+            margin-bottom: 3.5rem;
+            text-align: center;
+        }
+
+        .section-title::before {
+            content: '// ';
+            color: var(--muted);
+        }
+
+        /* ─── FEATURES ───────────────────────────────── */
+        #features {
+            background: var(--bg2);
+        }
+
+        #features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 1.8rem 1.5rem;
+            transition: border-color .25s, box-shadow .25s, transform .2s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--neon);
+            box-shadow: 0 0 24px rgba(255, 224, 0, .2);
+            transform: translateY(-4px);
+        }
+
+        .feat-icon {
+            font-size: 2rem;
+            margin-bottom: .9rem;
+        }
+
+        .feature-card h3 {
+            font-size: .85rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--neon);
+            margin-bottom: .5rem;
+        }
+
+        .feature-card p {
+            font-family: var(--mono);
+            font-size: .8rem;
+            color: var(--muted);
+        }
+
+        /* ─── COMPARISON ─────────────────────────────── */
+        #comparison {
+            background: var(--bg);
+        }
+
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card);
+            border: 1px solid var(--border);
+        }
+
+        .comp-table th,
+        .comp-table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            font-size: .85rem;
+            text-align: left;
+        }
+
+        .comp-table th {
+            font-family: var(--font);
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            font-size: .8rem;
+            color: var(--muted);
+        }
+
+        .comp-table th.hl {
+            color: var(--neon);
+            font-size: .9rem;
+        }
+
+        .comp-table td {
+            font-family: var(--mono);
+            color: var(--muted);
+        }
+
+        .comp-table .yes {
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        .comp-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comp-table tr:hover td {
+            background: rgba(255, 224, 0, .03);
+        }
+
+        /* ─── SKIN GALLERY ───────────────────────────── */
+        #skins {
+            background: var(--bg2);
+        }
+
+        #skin-preview {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .skin-cube {
+            width: 72px;
+            height: 72px;
+            border: 3px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            transition: border-color .2s, box-shadow .2s, transform .2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skin-cube:hover {
+            border-color: var(--neon);
+            box-shadow: 0 0 20px rgba(255, 224, 0, .4);
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        .skin-cube:nth-child(1) {
+            background: #ffe000;
+        }
+
+        .skin-cube:nth-child(2) {
+            background: #fff;
+        }
+
+        .skin-cube:nth-child(3) {
+            background: #ff2200;
+        }
+
+        .skin-cube:nth-child(4) {
+            background: #00ff44;
+        }
+
+        .skin-cube:nth-child(5) {
+            background: #00ccff;
+        }
+
+        .skin-cube:nth-child(6) {
+            background: #ff00ff;
+        }
+
+        .skin-label {
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--muted);
+            text-align: center;
+            margin-top: .5rem;
+        }
+
+        /* ─── CTA ────────────────────────────────────── */
+        #cta {
+            background: radial-gradient(ellipse at center, #1a1200 0%, var(--bg) 70%);
+            text-align: center;
+        }
+
+        #cta h2 {
+            color: var(--neon);
+            margin-bottom: 1rem;
+        }
+
+        #cta p {
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: .85rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-btns {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ─── FOOTER ─────────────────────────────────── */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--muted);
+        }
+
+        /* ─── RESPONSIVE ─────────────────────────────── */
+        @media (max-width: 600px) {
+            #hero-title {
+                font-size: 2.2rem;
+            }
+
+            #preview-cube {
+                width: 36px;
+                height: 36px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="scanlines"></div>
+
+    <!-- NAV -->
+    <nav id="navbar">
+        <div id="nav-logo">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <rect x="2" y="2" width="24" height="24" stroke="#ffe000" stroke-width="1.5" />
+                <rect x="7" y="7" width="14" height="14" fill="#ffe000" opacity=".25" />
+                <rect x="11" y="11" width="6" height="6" fill="#ffe000" />
+            </svg>
+            GD&nbsp;<span style="color:#fff">ULTIMATE</span>
+        </div>
+        <button class="btn-neon btn-sm" onclick="launchGame()">▶ ИГРАТЬ</button>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero">
+        <canvas id="hero-canvas"></canvas>
+        <div class="hero-content">
+            <div id="hero-badge">BROWSER GAME &nbsp;·&nbsp; MOBILE READY &nbsp;·&nbsp; SKIN EDITOR</div>
+            <h1 id="hero-title">GD<br /><span>ULTIMATE</span><br />EDITION</h1>
+            <p id="hero-sub">Шипы. Порталы. Gravity. Прыгай или умри.<br />
+                Geometry Dash прямо в браузере — с редактором скинов и хардкором.</p>
+            <div class="hero-btns">
+                <button class="btn-neon btn-lg" onclick="launchGame()">▶ ИГРАТЬ СЕЙЧАС</button>
+                <button class="btn-neon btn-lg btn-cyan"
+                    onclick="document.querySelector('#features').scrollIntoView({behavior:'smooth'})">ЧТО ВНУТРИ
+                    ↓</button>
+            </div>
+
+            <!-- LIVE PREVIEW -->
+            <div id="preview-box">
+                <div id="preview-grid"></div>
+                <div id="preview-cube"></div>
+                <div class="preview-spike"></div>
+                <div class="preview-spike"></div>
+                <div class="preview-portal"></div>
+                <div id="preview-floor"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features">
+        <div class="section-inner">
+            <h2 class="section-title">ОСОБЕННОСТИ</h2>
+            <div id="features-grid">
+                <div class="feature-card">
+                    <div class="feat-icon">🟨</div>
+                    <h3>Физика 60 FPS</h3>
+                    <p>Прыжки, гравитация и столкновения рассчитываются каждый кадр. Без рывков, без лагов.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feat-icon">🌀</div>
+                    <h3>Порталы</h3>
+                    <p>Проходи через порталы — размер куба меняется. Мини-режим открывает новые маршруты.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feat-icon">🎨</div>
+                    <h3>Редактор скинов</h3>
+                    <p>16×16 пиксель-арт редактор. Рисуй пальцем или мышкой, загружай фото, применяй к кубу.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feat-icon">📱</div>
+                    <h3>Touch Ready</h3>
+                    <p>Полная поддержка тач-экранов и multi-touch. iPhone, iPad, Android — без проблем.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feat-icon">💎</div>
+                    <h3>Разблокируемые цвета</h3>
+                    <p>Набирай очки — открывай новые скины. 6 цветов куба от жёлтого до фиолетового.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feat-icon">⚡</div>
+                    <h3>Нарастающая скорость</h3>
+                    <p>Чем больше очков — тем быстрее летят шипы. Каждый забег сложнее предыдущего.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMPARISON -->
+    <section id="comparison">
+        <div class="section-inner">
+            <h2 class="section-title">СРАВНЕНИЕ</h2>
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th>Функция</th>
+                        <th>Обычный веб-клон</th>
+                        <th class="hl">GD ULTIMATE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Управление</td>
+                        <td>Только пробел/мышь</td>
+                        <td class="yes">✓ Touch · Mouse · Keyboard</td>
+                    </tr>
+                    <tr>
+                        <td>Физика</td>
+                        <td>Дёрганая setTimeout</td>
+                        <td class="yes">✓ requestAnimationFrame 60fps</td>
+                    </tr>
+                    <tr>
+                        <td>Препятствия</td>
+                        <td>Только шипы</td>
+                        <td class="yes">✓ Шипы, блоки, порталы, бонусы</td>
+                    </tr>
+                    <tr>
+                        <td>Кастомизация</td>
+                        <td>Нет</td>
+                        <td class="yes">✓ Пиксель-арт редактор + фото</td>
+                    </tr>
+                    <tr>
+                        <td>Очки и рекорды</td>
+                        <td>Сессионные (сбрасываются)</td>
+                        <td class="yes">✓ Сохранение в localStorage</td>
+                    </tr>
+                    <tr>
+                        <td>Мобильные</td>
+                        <td>Не адаптировано</td>
+                        <td class="yes">✓ Полный адаптив + iOS fix</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SKINS -->
+    <section id="skins">
+        <div class="section-inner" style="text-align:center">
+            <h2 class="section-title">СКИНЫ КУБА</h2>
+            <p style="color:var(--muted);font-family:var(--mono);font-size:.8rem;margin-bottom:2.5rem;">
+                Разблокируй цвета по мере накопления очков. Рисуй свой скин в редакторе.
+            </p>
+            <div id="skin-preview">
+                <div>
+                    <div class="skin-cube"></div>
+                    <div class="skin-label">СТАРТ<br>0 pts</div>
+                </div>
+                <div>
+                    <div class="skin-cube"></div>
+                    <div class="skin-label">БЕЛЫЙ<br>0 pts</div>
+                </div>
+                <div>
+                    <div class="skin-cube"></div>
+                    <div class="skin-label">ОГОНЬ<br>50 pts</div>
+                </div>
+                <div>
+                    <div class="skin-cube"></div>
+                    <div class="skin-label">МАТРИЦА<br>100 pts</div>
+                </div>
+                <div>
+                    <div class="skin-cube"></div>
+                    <div class="skin-label">ПРИЗМА<br>150 pts</div>
+                </div>
+                <div>
+                    <div class="skin-cube"></div>
+                    <div class="skin-label">ХАОС<br>200 pts</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="cta">
+        <div class="section-inner">
+            <h2 class="section-title">ГОТОВ К ПРЫЖКУ?</h2>
+            <p>Нет установок. Нет регистраций.<br />Просто открой и прыгай.</p>
+            <div class="cta-btns">
+                <button class="btn-neon btn-lg" onclick="launchGame()">▶ ЗАПУСТИТЬ ИГРУ</button>
+                <button class="btn-neon btn-lg btn-cyan" onclick="launchEditor()">🎨 РЕДАКТОР СКИНОВ</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        GD ULTIMATE EDITION &nbsp;©&nbsp; 2026 &nbsp;|&nbsp; HTML5 Canvas · Vanilla JS · Mobile Ready
+    </footer>
+
+    <script>
+        // ─── Hero background particle canvas ─────────────────
+        const hc = document.getElementById('hero-canvas');
+        const hctx = hc.getContext('2d');
+        let dots = [];
+        function resizeHC() {
+            hc.width = hc.offsetWidth;
+            hc.height = hc.offsetHeight;
+        }
+        function initDots() {
+            dots = [];
+            for (let i = 0; i < 60; i++) {
+                dots.push({
+                    x: Math.random() * hc.width,
+                    y: Math.random() * hc.height,
+                    r: Math.random() * 1.5 + 0.5,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    a: Math.random() * 0.7 + 0.2,
+                });
+            }
+        }
+        function animHero() {
+            hctx.clearRect(0, 0, hc.width, hc.height);
+            for (const d of dots) {
+                d.x += d.vx; d.y += d.vy;
+                if (d.x < 0) d.x = hc.width;
+                if (d.x > hc.width) d.x = 0;
+                if (d.y < 0) d.y = hc.height;
+                if (d.y > hc.height) d.y = 0;
+                hctx.beginPath();
+                hctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+                hctx.fillStyle = `rgba(255,224,0,${d.a})`;
+                hctx.fill();
+            }
+            // Connect nearby dots
+            for (let i = 0; i < dots.length; i++) {
+                for (let j = i + 1; j < dots.length; j++) {
+                    const dx = dots[i].x - dots[j].x, dy = dots[i].y - dots[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 120) {
+                        hctx.beginPath();
+                        hctx.moveTo(dots[i].x, dots[i].y);
+                        hctx.lineTo(dots[j].x, dots[j].y);
+                        hctx.strokeStyle = `rgba(255,224,0,${0.12 * (1 - dist / 120)})`;
+                        hctx.lineWidth = 0.6;
+                        hctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animHero);
+        }
+        resizeHC(); initDots(); animHero();
+        window.addEventListener('resize', () => { resizeHC(); initDots(); });
+
+        // ─── Launch game ──────────────────────────────────────
+        function launchGame() {
+            window.location.href = 'index.html';
+        }
+        function launchEditor() {
+            // Opens game directly to editor
+            sessionStorage.setItem('gd_open_editor', '1');
+            window.location.href = 'index.html';
+        }
+
+        // ─── Navbar scroll style ──────────────────────────────
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            nav.style.background = window.scrollY > 40
+                ? 'rgba(1,3,8,0.97)'
+                : 'rgba(1,3,8,0.85)';
+        });
+    </script>
+</body>
+
+</html>
