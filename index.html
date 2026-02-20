@@ -763,12 +763,12 @@
 
         // ─── Launch game ──────────────────────────────────────
         function launchGame() {
-            window.location.href = 'game.html';
+            window.location.assign('./game.html');
         }
         function launchEditor() {
             // Opens game directly to editor
             sessionStorage.setItem('gd_open_editor', '1');
-            window.location.href = 'game.html';
+            window.location.assign('./game.html');
         }
 
         // ─── Navbar scroll style ──────────────────────────────
