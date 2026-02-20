@@ -879,6 +879,7 @@
             coin: () => { [700, 900, 1100].forEach((f, i) => setTimeout(() => tone(f, 'sine', .12, .25), i * 60)); },
             portal: () => tone(200, 'sawtooth', .3, .3, 900),
             mode: () => tone(330, 'triangle', .2, .25),
+            ach: () => { [500, 700, 900, 1200].forEach((f, i) => setTimeout(() => tone(f, 'square', .15, .2), i * 80)); },
         };
 
         /* ═══════════════════════════════════════════════
