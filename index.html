@@ -690,42 +690,6 @@
         </div>
     </section>
 
-    <!-- SKINS -->
-    <section id="skins">
-        <div class="section-inner" style="text-align:center">
-            <h2 class="section-title">СКИНЫ КУБА</h2>
-            <p style="color:var(--muted);font-family:var(--mono);font-size:.8rem;margin-bottom:2.5rem;">
-                Разблокируй цвета по мере накопления очков. Рисуй свой скин в редакторе.
-            </p>
-            <div id="skin-preview">
-                <div>
-                    <div class="skin-cube"></div>
-                    <div class="skin-label">СТАРТ<br>0 pts</div>
-                </div>
-                <div>
-                    <div class="skin-cube"></div>
-                    <div class="skin-label">БЕЛЫЙ<br>0 pts</div>
-                </div>
-                <div>
-                    <div class="skin-cube"></div>
-                    <div class="skin-label">ОГОНЬ<br>50 pts</div>
-                </div>
-                <div>
-                    <div class="skin-cube"></div>
-                    <div class="skin-label">МАТРИЦА<br>100 pts</div>
-                </div>
-                <div>
-                    <div class="skin-cube"></div>
-                    <div class="skin-label">ПРИЗМА<br>150 pts</div>
-                </div>
-                <div>
-                    <div class="skin-cube"></div>
-                    <div class="skin-label">ХАОС<br>200 pts</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- CTA -->
     <section id="cta">
         <div class="section-inner">
@@ -799,12 +763,12 @@
 
         // ─── Launch game ──────────────────────────────────────
         function launchGame() {
-            window.location.href = 'index.html';
+            window.location.href = 'game.html';
         }
         function launchEditor() {
             // Opens game directly to editor
             sessionStorage.setItem('gd_open_editor', '1');
-            window.location.href = 'index.html';
+            window.location.href = 'game.html';
         }
 
         // ─── Navbar scroll style ──────────────────────────────
